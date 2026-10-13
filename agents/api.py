@@ -13,7 +13,7 @@ supervisor = SystemSupervisor(model_provider="mock")
 
 app = FastAPI(
     title="Grade Evidence Certainty Agent API",
-    description="Enterprise Distributed Component Platform (Radiology & Neuroimaging Systems)",
+    description="Enterprise Distributed Component Platform (Legacy metric threshold demonstration)",
     version="3.0.0-ENTERPRISE",
 )
 
@@ -44,7 +44,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "HEALTHY", "service": "grade-evidence-certainty-agent", "domain": "Radiology & Neuroimaging Systems", "standard": "ACR RADS / Fleischner Society / ASPECTS Guidelines", "version": "3.0.0-ENTERPRISE"}
+    return {"status": "HEALTHY", "service": "grade-evidence-certainty-agent", "domain": "Legacy metric threshold demonstration", "standard": "Internal demonstration rules only", "version": "3.0.0-ENTERPRISE"}
 
 
 @app.get("/metrics")
