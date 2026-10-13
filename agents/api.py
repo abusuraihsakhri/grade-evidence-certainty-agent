@@ -3,7 +3,8 @@ FastAPI REST API Server for Grade Evidence Certainty Agent.
 """
 from typing import Dict, Any, List
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from grade_evidence_certainty_agent.certainty import CertaintyAssessment, assess_certainty
 from .base import AuditLogger, PHIGuard
 from .models import SystemTaskPayload, ConsensusDossier
 from .supervisor import SystemSupervisor
@@ -12,9 +13,29 @@ supervisor = SystemSupervisor(model_provider="mock")
 
 app = FastAPI(
     title="Grade Evidence Certainty Agent API",
-    description="Enterprise Distributed Component Platform (Radiology & Neuroimaging Systems)",
+    description="Enterprise Distributed Component Platform (Legacy metric threshold demonstration)",
     version="3.0.0-ENTERPRISE",
 )
+
+
+class GradeRequest(BaseModel):
+    study_design: str
+    risk_of_bias: int = Field(default=0, ge=0, le=2, strict=True)
+    inconsistency: int = Field(default=0, ge=0, le=2, strict=True)
+    indirectness: int = Field(default=0, ge=0, le=2, strict=True)
+    imprecision: int = Field(default=0, ge=0, le=2, strict=True)
+    publication_bias: int = Field(default=0, ge=0, le=2, strict=True)
+    large_effect: int = Field(default=0, ge=0, le=2, strict=True)
+    dose_response: int = Field(default=0, ge=0, le=1, strict=True)
+    plausible_confounding: int = Field(default=0, ge=0, le=1, strict=True)
+
+
+@app.post("/api/grade")
+def api_grade(req: GradeRequest):
+    try:
+        return assess_certainty(CertaintyAssessment(**req.model_dump()))
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 class ChatRequest(BaseModel):
@@ -23,7 +44,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "HEALTHY", "service": "grade-evidence-certainty-agent", "domain": "Radiology & Neuroimaging Systems", "standard": "ACR RADS / Fleischner Society / ASPECTS Guidelines", "version": "3.0.0-ENTERPRISE"}
+    return {"status": "HEALTHY", "service": "grade-evidence-certainty-agent", "domain": "Legacy metric threshold demonstration", "standard": "Internal demonstration rules only", "version": "3.0.0-ENTERPRISE"}
 
 
 @app.get("/metrics")

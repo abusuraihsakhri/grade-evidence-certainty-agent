@@ -1,5 +1,5 @@
 """
-Clinical Algorithmic Engine & Guideline Rules for GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer.
+Legacy metric threshold demonstration. Not an implementation of GRADE domain assessments.
 Domain: Evidence-Based Medicine
 Standard: GRADE Handbook for Evidence Synthesis
 """
@@ -9,7 +9,7 @@ from .models import ClinicalCasePayload, AgentAlert, UrgencyLevel, ClinicalInteg
 
 
 class ClinicalDomainEngine:
-    GUIDELINE = "GRADE Handbook for Evidence Synthesis"
+    GUIDELINE = "Internal demonstration thresholds; not a clinical guideline"
     PRIMARY_BASELINE_LIMIT = 20.0
     SECONDARY_ALERT_LIMIT = 10.0
 
@@ -18,8 +18,8 @@ class ClinicalDomainEngine:
         if value > cls.PRIMARY_BASELINE_LIMIT:
             return {
                 "title": "Primary Metric Threshold Exceeded",
-                "finding": f"Observed value ({value:.2f}) exceeds GRADE Handbook for Evidence Synthesis clinical baseline limit ({cls.PRIMARY_BASELINE_LIMIT:.1f}).",
-                "recommendation": "Perform immediate secondary verification and calibration review.",
+                "finding": f"Observed value ({value:.2f}) exceeds an internal demonstration threshold ({cls.PRIMARY_BASELINE_LIMIT:.1f}).",
+                "recommendation": "Review the input and relevance of this example threshold.",
             }
         return None
 
@@ -27,9 +27,9 @@ class ClinicalDomainEngine:
     def evaluate_secondary_kinetics(cls, value: float, is_stat: bool) -> Optional[Dict[str, Any]]:
         if value > cls.SECONDARY_ALERT_LIMIT or is_stat:
             return {
-                "title": "STAT Kinetic Escalation Triggered",
-                "finding": f"Kinetic parameter ({value:.2f}) with STAT={is_stat} requires prioritized supervision.",
-                "recommendation": "Activate closed-loop verbal clinician notification protocol per Joint Commission standards.",
+                "title": "Priority Flag / Secondary Threshold Triggered",
+                "finding": f"Kinetic parameter ({value:.2f}) with STAT={is_stat} matches an example priority rule.",
+                "recommendation": "Review the flagged result manually; this tool does not notify clinicians.",
             }
         return None
 
@@ -40,6 +40,6 @@ class ClinicalDomainEngine:
             return {
                 "title": "Phenotypic / Biomarker Discordance Identified",
                 "finding": f"Status flag '{status_flag}' indicates divergence from standard diagnostic concordance.",
-                "recommendation": f"Order reflex confirmatory testing per GRADE Handbook for Evidence Synthesis clinical recommendations.",
+                "recommendation": f"Review the descriptor against the relevant evidence; no test order is implied.",
             }
         return None

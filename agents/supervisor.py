@@ -1,6 +1,6 @@
 """
 Supervisor Orchestrator & Operations Intelligence for Grade Evidence Certainty Agent.
-Domain: Radiology & Neuroimaging Systems
+Domain: Legacy metric threshold demonstration
 """
 import uuid
 from typing import Dict, Any, List, Optional
@@ -75,5 +75,5 @@ class SystemSupervisor:
 
     def query_supervisory_chat(self, query: str) -> str:
         PHIGuard.assert_no_phi(query)
-        prompt = f"Supervisor inquiry for Grade Evidence Certainty Agent under ACR RADS / Fleischner Society / ASPECTS Guidelines: {query}"
+        prompt = f"Supervisor inquiry for Grade Evidence Certainty Agent under internal demonstration thresholds: {query}"
         return self.llm.invoke(prompt)

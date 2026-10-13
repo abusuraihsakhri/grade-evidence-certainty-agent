@@ -1,7 +1,7 @@
 """
 Specialized Domain Worker Agents for Grade Evidence Certainty Agent.
-Domain: Radiology & Neuroimaging Systems
-Standard: ACR RADS / Fleischner Society / ASPECTS Guidelines
+Domain: Legacy metric threshold demonstration
+Standard: Internal demonstration rules; not a validated clinical guideline
 """
 import uuid
 from typing import Dict, Any, List, Optional
@@ -20,8 +20,8 @@ class InvariantQCWorker:
                 origin_worker="InvariantQCWorker",
                 urgency=UrgencyLevel.ELEVATED,
                 summary="Primary Metric Threshold Exceeded",
-                technical_details=f"Primary measurement ({payload.primary_metric:.2f}) exceeds upper reference limit (25.00) under ACR RADS / Fleischner Society / ASPECTS Guidelines.",
-                actionable_remediation="Initiate recalibration workflow and review secondary parameters.",
+                technical_details=f"Primary measurement ({payload.primary_metric:.2f}) exceeds upper reference limit (25.00) under an internal demonstration rule (not a clinical reference interval).",
+                actionable_remediation="Review the input and applicability of this example threshold.",
             ))
         return alerts
 
@@ -37,9 +37,9 @@ class SafetyEscalationWorker:
                 alert_id=f"SAFE-{uuid.uuid4().hex[:6]}",
                 origin_worker="SafetyEscalationWorker",
                 urgency=UrgencyLevel.CRITICAL_STAT if payload.is_critical_flag else UrgencyLevel.ELEVATED,
-                summary="Critical Safety Interlock Triggered",
+                summary="Priority Flag / Secondary Threshold Triggered",
                 technical_details=f"CriticalFlag={payload.is_critical_flag} with secondary index {payload.secondary_metric:.2f}.",
-                actionable_remediation="Execute immediate closed-loop escalation and notify attending supervisor.",
+                actionable_remediation="Review this priority flag with the responsible human operator; no notification is sent by this software.",
             ))
         return alerts
 
@@ -57,7 +57,7 @@ class ProtocolConformanceWorker:
                 origin_worker="ProtocolConformanceWorker",
                 urgency=UrgencyLevel.ELEVATED,
                 summary="Protocol Conformance Discordance Detected",
-                technical_details=f"Descriptor '{payload.status_descriptor}' indicates discordance with ACR RADS / Fleischner Society / ASPECTS Guidelines standards.",
-                actionable_remediation="Re-evaluate input specimen or rerun secondary confirmation assay.",
+                technical_details=f"Descriptor '{payload.status_descriptor}' matches a configured demonstration warning term; no guideline conformance is established.",
+                actionable_remediation="Manually review the descriptor and relevant source evidence.",
             ))
         return alerts

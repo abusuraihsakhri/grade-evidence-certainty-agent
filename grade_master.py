@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer
-Evaluates systematic review outcomes across 5 downgrade domains (Risk of bias, Inconsistency, Indirectness, Imprecision, Publication bias) and upgrades.
+Legacy threshold demonstration; genuine GRADE certainty assessments are in grade_evidence_certainty_agent.certainty.
 
 Domain: Evidence-Based Medicine
 Author: Dr. Abu Suraih Sakhri
@@ -13,6 +13,7 @@ import csv
 import datetime
 import json
 import sys
+import math
 import uuid
 from enum import Enum
 from typing import Dict, Any, List, Optional
@@ -33,15 +34,15 @@ class Severity(str, Enum):
 class DomainKnowledgeRegistry:
     """Enterprise domain rules, guideline matrices, and evidence benchmarks."""
     SYSTEM_VERSION = "2.0.0-PRO-CLINICAL"
-    ZERO_PHI_COMPLIANCE = True
-    HIPAA_SAFE_HARBOR = "ACTIVE_ON_PREMISES"
+    ZERO_PHI_COMPLIANCE = False
+    HIPAA_SAFE_HARBOR = "NOT_ASSESSED"
 
     @staticmethod
     def audit_security_and_integrity(payload: Dict[str, Any]) -> List[str]:
         warnings = []
         for key in payload.keys():
             if any(phi_keyword in key.lower() for phi_keyword in ["patient_name", "ssn", "mrn_raw", "dob_raw"]):
-                warnings.append(f"PHI_DEFENSE_TRIGGERED: Direct identifier '{key}' masked to synthetic token.")
+                warnings.append(f"PHI_DEFENSE_TRIGGERED: Potential identifier field '{key}' detected; input was not redacted.")
         return warnings
 
 class AgentAlert:
@@ -71,6 +72,8 @@ class RiskOfBiasSynthesizerAgent:
     def evaluate(self, payload: Dict[str, Any]) -> List[AgentAlert]:
         alerts = []
         val1 = float(payload.get("metric_primary", 15.0))
+        if not math.isfinite(val1):
+            raise ValueError("metric_primary must be finite")
         if val1 > 20.0:
             alerts.append(
                 AgentAlert(
@@ -78,8 +81,8 @@ class RiskOfBiasSynthesizerAgent:
                     agent_name="RiskOfBiasSynthesizerAgent",
                     severity=Severity.WARNING,
                     title="Primary Metric Threshold Discrepancy",
-                    details=f"Primary metric value ({val1:.1f}) exceeded standard clinical baseline.",
-                    recommendation="Perform secondary cross-check and review calibration profile.",
+                    details=f"Primary metric value ({val1:.1f}) exceeded an internal example threshold (not a GRADE domain judgment).",
+                    recommendation="Review input validity and whether this example threshold is relevant.",
                 )
             )
         return alerts
@@ -89,17 +92,27 @@ class HeterogeneityImprecisionAgent:
     """Specialized Sub-Agent 2 for grade-evidence-certainty-agent"""
     def evaluate(self, payload: Dict[str, Any]) -> List[AgentAlert]:
         alerts = []
-        is_critical = bool(payload.get("critical_flag", False))
+        flag = payload.get("critical_flag", False)
+        if isinstance(flag, bool):
+            is_critical = flag
+        elif str(flag).strip().lower() in ("true", "1", "yes"):
+            is_critical = True
+        elif str(flag).strip().lower() in ("false", "0", "no", ""):
+            is_critical = False
+        else:
+            raise ValueError("critical_flag must be a boolean")
         val2 = float(payload.get("metric_secondary", 5.0))
+        if not math.isfinite(val2):
+            raise ValueError("metric_secondary must be finite")
         if is_critical or val2 > 12.0:
             alerts.append(
                 AgentAlert(
                     alert_id=str(uuid.uuid4())[:8],
                     agent_name="HeterogeneityImprecisionAgent",
                     severity=Severity.CRITICAL,
-                    title="Urgent Consensus Protocol Trigger",
+                    title="Example Priority Flag / Threshold Trigger",
                     details=f"Secondary parameter index ({val2:.1f}) triggered automated supervisory escalation.",
-                    recommendation="Initiate mandatory closed-loop clinical notification protocol.",
+                    recommendation="Review the priority flag manually; no clinician notification is performed.",
                 )
             )
         return alerts
@@ -118,7 +131,7 @@ class CertaintyGradeAggregatorAgent:
                     severity=Severity.ADVISORY,
                     title="Biomarker / Feature Discordance Flag",
                     details=f"Phenotypic discordance noted in observation status ({status_text}).",
-                    recommendation="Reconcile correlative findings with secondary confirmatory testing.",
+                    recommendation="Review descriptor evidence manually; no diagnostic test is indicated by this demonstration.",
                 )
             )
         return alerts
@@ -143,7 +156,7 @@ class GRADEMasterCoordinator:
         critical_count = sum(1 for a in all_alerts if a.severity == Severity.CRITICAL)
         warning_count = sum(1 for a in all_alerts if a.severity == Severity.WARNING)
 
-        overall_status = "CRITICAL_ACTION_REQUIRED" if critical_count > 0 else ("WARNING_ACTIVE" if warning_count > 0 else "CONCORDANT_NORMAL")
+        overall_status = "CRITICAL_ACTION_REQUIRED" if critical_count > 0 else ("WARNING_ACTIVE" if warning_count > 0 else ("ADVISORY_ACTIVE" if all_alerts else "CONCORDANT_NORMAL"))
 
         dossier = {
             "system": "grade-evidence-certainty-agent",
@@ -166,9 +179,9 @@ class GRADEMasterCoordinator:
         if "summary" in q or "status" in q:
             return f"GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer currently tracking {len(self.case_registry)} cases in local air-gapped memory."
         elif "guidelines" in q or "protocol" in q:
-            return "All sub-agents operate under validated consensus clinical algorithms and CAP/CLSI/NCCN/WHO standards."
+            return "These legacy agents use internal example thresholds; no clinical guideline validation is claimed."
         else:
-            return f"GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer executive agent online. Continuous supervisory monitoring active across all domain parameters."
+            return f"GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer executive agent online. The demonstration responds on demand; no background surveillance is active."
 
 
 coordinator = GRADEMasterCoordinator()

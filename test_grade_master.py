@@ -23,7 +23,7 @@ def test_coordinator():
     assert dossier["total_alerts"] == 0
 
     ans = coord.query_assistant("What are the guidelines?")
-    assert "guidelines" in ans or "standards" in ans
+    assert "internal example thresholds" in ans
 
 
 def test_cli():
@@ -33,5 +33,18 @@ def test_cli():
 
 def test_domain_registry():
     from grade_master import DomainKnowledgeRegistry
-    assert DomainKnowledgeRegistry.ZERO_PHI_COMPLIANCE is True
+    assert DomainKnowledgeRegistry.ZERO_PHI_COMPLIANCE is False
     assert "PRO" in DomainKnowledgeRegistry.SYSTEM_VERSION
+
+def test_advisory_is_not_reported_as_normal():
+    coord = GRADEMasterCoordinator()
+    dossier = coord.audit_case({"metric_primary": 5, "metric_secondary": 5, "status_text": "DISCORDANT"})
+    assert dossier["overall_status"] == "ADVISORY_ACTIVE"
+
+
+def test_csv_false_does_not_escalate_and_nonfinite_rejected():
+    coord = GRADEMasterCoordinator()
+    dossier = coord.audit_case({"metric_primary": "1", "metric_secondary": "2", "critical_flag": "False"})
+    assert dossier["critical_count"] == 0
+    with pytest.raises(ValueError):
+        coord.audit_case({"metric_primary": float("nan")})

@@ -93,7 +93,7 @@ class GRADEMasterCoordinator:
             "stat_critical_alerts": stat_count,
             "warning_alerts": warn_count,
             "alerts": [a.to_dict() for a in all_alerts],
-            "guideline_standard": "GRADE Handbook for Evidence Synthesis",
+            "guideline_standard": "Internal demonstration thresholds (not GRADE clinical guidance)",
             "consensus_summary": f"Multi-agent supervision completed across 3 sub-agents with status [{status.value}].",
         }
 
@@ -105,6 +105,6 @@ class GRADEMasterCoordinator:
         if "status" in q or "summary" in q:
             return f"GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer currently tracking {len(self.case_registry)} cases in on-premises memory."
         elif "guideline" in q or "standard" in q:
-            return "Active clinical surveillance operates under GRADE Handbook for Evidence Synthesis validated protocols."
+            return "This legacy metric demonstration uses internal thresholds; no validated clinical protocol is implemented."
         else:
-            return f"GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer executive agent online. Zero-PHI air-gapped monitoring active."
+            return f"GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer legacy metric demonstration available locally; no PHI de-identification guarantee."
