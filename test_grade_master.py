@@ -23,7 +23,7 @@ def test_coordinator():
     assert dossier["total_alerts"] == 0
 
     ans = coord.query_assistant("What are the guidelines?")
-    assert "guidelines" in ans or "standards" in ans
+    assert "internal example thresholds" in ans
 
 
 def test_cli():
