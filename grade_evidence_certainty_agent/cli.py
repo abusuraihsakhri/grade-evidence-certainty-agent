@@ -7,6 +7,7 @@ import json
 import sys
 from .models import ClinicalCasePayload
 from .agents import GRADEMasterCoordinator
+from .certainty import CertaintyAssessment, assess_certainty
 
 coordinator = GRADEMasterCoordinator()
 
@@ -14,6 +15,13 @@ coordinator = GRADEMasterCoordinator()
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="grade-evidence-certainty-agent", description="GRADE-Master: Autonomous Body of Evidence Certainty & Recommendation Scorer")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # Assessor-entered GRADE rating for intervention outcomes
+    p_grade = subparsers.add_parser("grade", help="Rate certainty for one intervention outcome")
+    p_grade.add_argument("--design", required=True, choices=("randomized", "observational"))
+    for domain in ("risk-of-bias", "inconsistency", "indirectness", "imprecision", "publication-bias",
+                   "large-effect", "dose-response", "plausible-confounding"):
+        p_grade.add_argument("--" + domain, type=int, default=0)
 
     # Audit
     p_audit = subparsers.add_parser("audit", help="Run single case clinical audit")
@@ -38,6 +46,25 @@ def main(argv=None):
     p_serve.add_argument("--port", type=int, default=8000)
 
     args = parser.parse_args(argv)
+
+    if args.command == "grade":
+        try:
+            assessment = CertaintyAssessment(
+                study_design=args.design,
+                risk_of_bias=args.risk_of_bias,
+                inconsistency=args.inconsistency,
+                indirectness=args.indirectness,
+                imprecision=args.imprecision,
+                publication_bias=args.publication_bias,
+                large_effect=args.large_effect,
+                dose_response=args.dose_response,
+                plausible_confounding=args.plausible_confounding,
+            )
+            print(json.dumps(assess_certainty(assessment), indent=2))
+            return 0
+        except ValueError as exc:
+            print(f"Invalid GRADE judgment: {exc}", file=sys.stderr)
+            return 2
 
     if args.command == "audit":
         case = ClinicalCasePayload(
