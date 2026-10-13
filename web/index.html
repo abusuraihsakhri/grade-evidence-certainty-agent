@@ -1,236 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade Evidence Certainty Engine — Operations Console</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #090d16;
-            --card: #111827;
-            --border: #1f293d;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.25);
-            --text: #f3f4f6;
-            --text-muted: #9ca3af;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding: 2rem;
-            min-height: 100vh;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .header-title h1 { font-size: 1.6rem; font-weight: 700; color: #fff; }
-        .header-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: var(--accent-glow);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 1.5rem;
-        }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .card h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
-        input, select, textarea {
-            width: 100%;
-            padding: 0.65rem 0.9rem;
-            background: #0d1322;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #fff;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-        .btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 0.7rem 1.4rem;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-        }
-        .btn:hover { background: #2563eb; }
-        .terminal {
-            background: #060911;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: #10b981;
-            height: 380px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-        .metrics-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .metric-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .metric-val { font-size: 1.4rem; font-weight: 700; color: #fff; margin-top: 0.25rem; }
-        .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'">
+  <meta name="description" content="Transparent, locally calculated GRADE certainty-of-evidence ratings for intervention outcomes.">
+  <title>GRADE Certainty of Evidence</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
 </head>
 <body>
-
-    <div class="header">
-        <div class="header-title">
-            <h1>Grade Evidence Certainty Engine</h1>
-            <p>Domain: Clinical & Cryptographic AI | Standard: CAP / CLSI / NIST Standards | LabMind-Atlas Architecture</p>
-        </div>
-        <div>
-            <span class="badge">Air-Gapped Active</span>
-            <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; border-color: #10b981;">Zero-PHI Guard Active</span>
-        </div>
+  <header class="site-header">
+    <div class="wrap">
+      <p class="eyebrow">Evidence synthesis · Outcome-level assessment</p>
+      <h1>GRADE certainty of evidence</h1>
+      <p class="lead">Calculate a transparent certainty rating from domain judgments entered by a reviewer. Runs entirely in your browser, with no account or backend.</p>
     </div>
-
-    <div class="metrics-bar">
-        <div class="metric-box">
-            <div class="metric-label">System Status</div>
-            <div class="metric-val" style="color: var(--success);" id="m-status">OPTIMAL</div>
+  </header>
+  <main class="wrap main-grid">
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Assessment</h2>
+        <p class="muted">Use the conventional intervention-outcome approach: randomized studies start at high certainty; non-randomized studies start at low. ROBINS-I high-start assessments are not modeled.</p>
+      </div>
+      <form id="assessment-form">
+        <div class="form-row">
+          <label for="outcome">Outcome label <span class="muted">(optional)</span></label>
+          <input type="text" id="outcome" maxlength="100" placeholder="e.g., all-cause mortality" autocomplete="off">
+          <p class="hint">Do not enter patient identifiers or protected health information.</p>
         </div>
-        <div class="metric-box">
-            <div class="metric-label">Tasks Processed</div>
-            <div class="metric-val" id="m-tasks">142</div>
+        <div class="form-row">
+          <label for="study_design">Body of evidence</label>
+          <select id="study_design" required>
+            <option value="randomized">Randomized controlled trials — starts high</option>
+            <option value="observational">Non-randomized studies — starts low</option>
+          </select>
         </div>
-        <div class="metric-box">
-            <div class="metric-label">Audit Blocks Signed</div>
-            <div class="metric-val" id="m-audit">142</div>
+        <fieldset>
+          <legend>Downgrading domains</legend>
+          <p class="hint">0 = no downgrade · 1 = serious concern · 2 = very serious concern</p>
+          <div class="domain-grid">
+            <div class="form-row"><label for="risk_of_bias">Risk of bias</label><select id="risk_of_bias"><option value="0">0 — No downgrade</option><option value="1">−1 — Serious</option><option value="2">−2 — Very serious</option></select></div>
+            <div class="form-row"><label for="inconsistency">Inconsistency</label><select id="inconsistency"><option value="0">0 — No downgrade</option><option value="1">−1 — Serious</option><option value="2">−2 — Very serious</option></select></div>
+            <div class="form-row"><label for="indirectness">Indirectness</label><select id="indirectness"><option value="0">0 — No downgrade</option><option value="1">−1 — Serious</option><option value="2">−2 — Very serious</option></select></div>
+            <div class="form-row"><label for="imprecision">Imprecision</label><select id="imprecision"><option value="0">0 — No downgrade</option><option value="1">−1 — Serious</option><option value="2">−2 — Very serious</option></select></div>
+            <div class="form-row"><label for="publication_bias">Publication bias</label><select id="publication_bias"><option value="0">0 — No downgrade</option><option value="1">−1 — Suspected</option><option value="2">−2 — Very serious</option></select></div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Upgrading considerations</legend>
+          <p id="upgrade-eligibility" class="hint" aria-live="polite"></p>
+          <div class="domain-grid">
+            <div class="form-row"><label for="large_effect">Large magnitude of effect</label><select id="large_effect"><option value="0">0 — No upgrade</option><option value="1">+1 — Large</option><option value="2">+2 — Very large</option></select></div>
+            <div class="form-row"><label for="dose_response">Credible dose-response gradient</label><select id="dose_response"><option value="0">0 — No upgrade</option><option value="1">+1 — Present</option></select></div>
+            <div class="form-row"><label for="plausible_confounding">Opposing residual confounding</label><select id="plausible_confounding"><option value="0">0 — No upgrade</option><option value="1">+1 — Supports inference</option></select></div>
+          </div>
+        </fieldset>
+        <div class="actions">
+          <button class="primary" type="submit">Calculate certainty</button>
+          <button class="secondary" type="button" id="reset-form">Reset</button>
         </div>
-        <div class="metric-box">
-            <div class="metric-label">PHI Interceptions</div>
-            <div class="metric-val" style="color: var(--accent);" id="m-phi">0</div>
+        <p id="error" role="alert" class="error"></p>
+      </form>
+    </section>
+    <aside class="sidebar">
+      <section class="panel result-panel" aria-label="Assessment result">
+        <h2>Result</h2>
+        <div id="result" role="status" aria-live="polite" hidden>
+          <p class="eyebrow">Assessor-entered rating</p>
+          <p class="result-title" id="grade-title"></p>
+          <p class="detail" id="grade-detail"></p>
         </div>
-    </div>
-
-    <div class="grid">
-        <div class="card">
-            <h2>⚙️ Dispatch Distributed Component Audit</h2>
-            <div class="form-group">
-                <label>Task / Sample ID</label>
-                <input type="text" id="task_id" value="TASK-2026-LIVE-01">
-            </div>
-            <div class="form-group">
-                <label>Target Identifier</label>
-                <input type="text" id="target_id" value="SPECIMEN-ALPHA-77">
-            </div>
-            <div class="form-group">
-                <label>Primary Measurement / Value</label>
-                <input type="number" id="primary_metric" value="29.4" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Secondary Metric / Kinetic Index</label>
-                <input type="number" id="secondary_metric" value="14.8" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Status / Phenotype Descriptor</label>
-                <input type="text" id="status_descriptor" value="DISCORDANT_ANOMALY">
-            </div>
-            <div class="form-group">
-                <label><input type="checkbox" id="is_critical" checked> Trigger Emergency / Critical Flag</label>
-            </div>
-            <button class="btn" onclick="runAudit()">Execute Distributed Component Audit</button>
-        </div>
-
-        <div class="card">
-            <h2>📊 Real-Time Consensus Dossier & Audit Log</h2>
-            <div class="terminal" id="outputConsole">// Grade Evidence Certainty Engine Operations Console Ready
-// Connection established with Air-Gapped Supervisor
-// Cryptographic HMAC-SHA256 audit ledger loaded.
-// Ready for live task payload dispatch...</div>
-        </div>
-    </div>
-
-    <script>
-        async function runAudit() {
-            const consoleEl = document.getElementById('outputConsole');
-            consoleEl.innerText = "// Dispatching task across specialized workers...
-// Invoking InvariantQCWorker, SafetyEscalationWorker, ProtocolWorker...";
-
-            const payload = {
-                task_id: document.getElementById('task_id').value,
-                target_identifier: document.getElementById('target_id').value,
-                primary_metric: parseFloat(document.getElementById('primary_metric').value),
-                secondary_metric: parseFloat(document.getElementById('secondary_metric').value),
-                status_descriptor: document.getElementById('status_descriptor').value,
-                is_critical_flag: document.getElementById('is_critical').checked
-            };
-
-            try {
-                const res = await fetch('/api/audit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                consoleEl.innerText = JSON.stringify(data, null, 2);
-                document.getElementById('m-tasks').innerText = parseInt(document.getElementById('m-tasks').innerText) + 1;
-                document.getElementById('m-audit').innerText = parseInt(document.getElementById('m-audit').innerText) + 1;
-            } catch (err) {
-                consoleEl.innerText = "// Offline / Simulation Output:\n" + JSON.stringify({
-                    dossier_id: "DOSSIER-SIM-" + Math.floor(Math.random()*10000),
-                    system: "grade-evidence-certainty-engine",
-                    domain: "Clinical & Cryptographic AI",
-                    task_id: payload.task_id,
-                    overall_urgency: payload.is_critical_flag ? "CRITICAL_STAT_PANIC" : "ELEVATED_RISK",
-                    integrity_status: "DISCORDANT_ANOMALY",
-                    alerts: [
-                        { worker: "InvariantQCWorker", alert: "Primary metric exceeds upper reference bound" },
-                        { worker: "SafetyEscalationWorker", alert: "Critical emergency interlock flag active" }
-                    ],
-                    audit_hash: "HMAC_SHA256_e83f9a72b941d6c381f9"
-                }, null, 2);
-            }
-        }
-    </script>
+        <p class="muted">Enter the domain judgments and select <strong>Calculate certainty</strong> to view the result.</p>
+        <button class="secondary download" type="button" id="download" disabled>Export assessment as JSON</button>
+      </section>
+      <section class="panel guidance">
+        <h2>Interpretation and limitations</h2>
+        <p>This is an arithmetic aid for documenting reviewer judgments, <strong>not an automated appraisal</strong>. Study limitations, imprecision, and upgrade criteria require substantive methodological justification. Certainty ratings apply to an outcome and body of evidence, not individual patients.</p>
+        <p>The rating is clamped to four categories: very low, low, moderate, and high. Upgrading is available only for non-randomized evidence without other downgrades under this conventional approach.</p>
+        <p><strong>Privacy:</strong> Input stays on this device. No analytics, API calls, or browser storage are used. Export creates a local JSON file.</p>
+        <p>Guidance: <a href="https://book.gradepro.org/guideline/overview-of-the-grade-approach" target="_blank" rel="noopener noreferrer">GRADE Book — Overview of the GRADE approach</a>.</p>
+      </section>
+    </aside>
+  </main>
+  <footer class="wrap footer">For research and evidence synthesis. Independent expert review is required before clinical or policy use.</footer>
 </body>
 </html>
