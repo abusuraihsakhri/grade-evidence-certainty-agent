@@ -43,3 +43,38 @@ def test_upgrades_and_ceiling():
 def test_invalid_judgments_rejected(assessment):
     with pytest.raises(ValueError):
         assess_certainty(assessment)
+
+def test_package_cli_grade(capsys):
+    import json
+    from grade_evidence_certainty_agent.cli import main
+    assert main(["grade", "--design", "randomized", "--risk-of-bias", "1"]) == 0
+    assert json.loads(capsys.readouterr().out)["certainty"] == "MODERATE"
+    assert main(["grade", "--design", "randomized", "--large-effect", "1"]) == 2
+
+
+def test_legacy_csv_boolean_parsing():
+    from grade_evidence_certainty_agent.cli import _csv_bool
+    assert _csv_bool("False") is False
+    assert _csv_bool("TRUE") is True
+    assert _csv_bool("0") is False
+    with pytest.raises(ValueError):
+        _csv_bool("maybe")
+
+
+def test_legacy_model_rejects_nonfinite_and_nonboolean():
+    from grade_evidence_certainty_agent.models import ClinicalCasePayload
+    template = dict(case_id="a", patient_synthetic_id="synthetic", primary_metric=1.0,
+                    secondary_metric=0.0, status_flag="NOMINAL")
+    with pytest.raises(ValueError):
+        ClinicalCasePayload(**{**template, "primary_metric": float("nan")})
+    with pytest.raises(ValueError):
+        ClinicalCasePayload(**{**template, "is_stat": "False"})
+
+
+def test_grade_api_validates_upgrade_rules():
+    from fastapi.testclient import TestClient
+    from agents.api import app
+    client = TestClient(app)
+    assert client.post("/api/grade", json={"study_design": "randomized"}).json()["certainty"] == "HIGH"
+    assert client.post("/api/grade", json={"study_design": "randomized", "large_effect": 1}).status_code == 422
+    assert client.post("/api/grade", json={"study_design": "observational", "risk_of_bias": -1}).status_code == 422
