@@ -5,11 +5,23 @@ import argparse
 import csv
 import json
 import sys
+from pathlib import Path
 from .models import ClinicalCasePayload
 from .agents import GRADEMasterCoordinator
 from .certainty import CertaintyAssessment, assess_certainty
 
 coordinator = GRADEMasterCoordinator()
+
+
+def _csv_bool(value):
+    if isinstance(value, bool):
+        return value
+    value = str(value or "").strip().lower()
+    if value in ("true", "1", "yes", "y"):
+        return True
+    if value in ("false", "0", "no", "n", ""):
+        return False
+    raise ValueError("is_stat must be a boolean (true/false/1/0/yes/no)")
 
 
 def main(argv=None):
@@ -95,22 +107,34 @@ def main(argv=None):
         return 0
 
     if args.command == "batch":
-        with open(args.input, mode="r", encoding="utf-8-sig") as f:
+        if Path(args.input).resolve() == Path(args.output).resolve():
+            print("Input and output CSV paths must differ", file=sys.stderr)
+            return 2
+        try:
+            source = open(args.input, mode="r", encoding="utf-8-sig", newline="")
+        except OSError as exc:
+            print(f"Unable to open input CSV: {exc}", file=sys.stderr)
+            return 2
+        with source as f:
             reader = csv.DictReader(f)
             fieldnames = list(reader.fieldnames or [])
             rows = list(reader)
 
-        out_fields = fieldnames + ["overall_status", "total_alerts", "stat_critical_alerts", "consensus_summary"]
+        out_fields = list(dict.fromkeys(fieldnames + ["overall_status", "total_alerts", "stat_critical_alerts", "consensus_summary"]))
         out_rows = []
-        for r in rows:
-            case = ClinicalCasePayload(
+        for line_number, r in enumerate(rows, start=2):
+            try:
+                case = ClinicalCasePayload(
                 case_id=r.get("case_id", "CASE-01"),
                 patient_synthetic_id=r.get("patient_synthetic_id", "SYNTH-01"),
                 primary_metric=float(r.get("metric_primary", r.get("primary_metric", 15.0))),
                 secondary_metric=float(r.get("metric_secondary", r.get("secondary_metric", 5.0))),
                 status_flag=r.get("status_flag", r.get("status_text", "NORMAL")),
-                is_stat=bool(r.get("is_stat", r.get("critical_flag", False))),
-            )
+                is_stat=_csv_bool(r.get("is_stat", r.get("critical_flag", False))),
+                )
+            except (TypeError, ValueError) as exc:
+                print(f"Invalid input at CSV row {line_number}: {exc}", file=sys.stderr)
+                return 2
             dossier = coordinator.process_case(case)
             row_dict = dict(r)
             row_dict["overall_status"] = dossier["overall_status"]
