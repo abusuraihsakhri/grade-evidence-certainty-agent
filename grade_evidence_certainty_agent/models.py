@@ -4,6 +4,7 @@ Domain: Evidence-Based Medicine
 Standard: GRADE Handbook for Evidence Synthesis
 """
 import datetime
+import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Any
@@ -33,6 +34,16 @@ class ClinicalCasePayload:
     clinical_notes: str = ""
     biomarkers: Dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+
+    def __post_init__(self):
+        if not self.case_id.strip():
+            raise ValueError("case_id must be non-empty")
+        for name in ("primary_metric", "secondary_metric"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                raise ValueError(f"{name} must be a finite number")
+        if not isinstance(self.is_stat, bool):
+            raise ValueError("is_stat must be a boolean")
 
 
 @dataclass
